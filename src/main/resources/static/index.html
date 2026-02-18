@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Platform</title>
+</head>
+<body>
+
+<h2>Add Business</h2>
+<input id="bname" placeholder="Name">
+<input id="bcategory" placeholder="Category">
+<input id="blocation" placeholder="Location">
+<button onclick="addBusiness()">Add</button>
+
+<hr>
+
+<h2>Submit Review</h2>
+<input id="uid" placeholder="User ID">
+<input id="bid" placeholder="Business ID">
+<input id="rating" placeholder="Rating (1-5)">
+<input id="comment" placeholder="Comment">
+<button onclick="submitReview()">Submit</button>
+
+<hr>
+
+<h2>View Approved Reviews</h2>
+<input id="viewBid" placeholder="Business ID">
+<button onclick="viewReviews()">View</button>
+
+<ul id="reviews"></ul>
+
+<script>
+    function addBusiness() {
+        fetch('/businesses', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name: bname.value,
+                category: bcategory.value,
+                location: blocation.value
+            })
+        }).then(r => r.json())
+          .then(d => alert('Business added with ID ' + d.id));
+    }
+
+    function submitReview() {
+        fetch('/reviews', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                userId: uid.value,
+                businessId: bid.value,
+                rating: rating.value,
+                comment: comment.value
+            })
+        }).then(() => alert('Review submitted (Pending approval)'));
+    }
+
+    function viewReviews() {
+        fetch('/reviews/business/' + viewBid.value)
+            .then(r => r.json())
+            .then(data => {
+                reviews.innerHTML = '';
+                data.forEach(r => {
+                    reviews.innerHTML += `<li>${r.comment} (Rating: ${r.rating})</li>`;
+                });
+            });
+    }
+</script>
+
+</body>
+</html>
